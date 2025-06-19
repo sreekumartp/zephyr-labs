@@ -45,7 +45,18 @@ jobs:
           west zephyr-export
           pip3 install -r zephyr/scripts/requirements.txt
 
+      - name: Install Zephyr SDK
+        run: |
+          wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.4/zephyr-sdk-0.16.4_linux-x86_64.tar.xz
+          tar xf zephyr-sdk-0.16.4_linux-x86_64.tar.xz
+          mv zephyr-sdk-0.16.4 $HOME/zephyr-sdk
+          $HOME/zephyr-sdk/setup.sh -t native_sim -h -c
+
+      - name: Set Zephyr SDK env
+        run: echo "ZEPHYR_SDK_INSTALL_DIR=$HOME/zephyr-sdk" >> $GITHUB_ENV
+
       - name: Build ${{ matrix.app }}
         run: |
           echo "🔧 Building ${{ matrix.app }}..."
           west build -b native_sim ${{ matrix.app }} --build-dir ${{ matrix.app }}/build
+
