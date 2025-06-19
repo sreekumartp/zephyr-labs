@@ -1,0 +1,43 @@
+# 🛠 Zephyr build and dependency folders
+build/
+zephyr/
+modules/
+tools/
+twister-out/
+twister-log.xml
+
+# 🧪 Optional for test outputs
+*.gcda
+*.gcno
+*.gcov
+
+# 🔧 West metadata
+.west/
+
+# 🔍 Editor folders
+.vscode/
+.idea/
+
+# 🧹 Backup / temp files
+*~
+*.swp
+*.bak
+*.tmp
+
+# 🧪 Per-app build folders
+apps/*/build/
+
+# 📦 Python caches (west, scripts, etc.)
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+pip-wheel-metadata/
+
+# 📝 Logs or output files
+*.log
+
+# 💻 OS files
+.DS_Store
+Thumbs.db
+

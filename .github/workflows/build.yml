@@ -1,0 +1,52 @@
+name: Zephyr CI
+
+on: [push, pull_request]
+
+jobs:
+  generate-matrix:
+    runs-on: ubuntu-latest
+    outputs:
+      matrix: ${{ steps.set-matrix.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@v3
+
+      - id: set-matrix
+        run: |
+          echo "🔍 Discovering Zephyr apps..."
+          apps=$(find apps -name prj.conf | sed 's|/prj.conf||' | sort)
+          json=$(echo "$apps" | jq -R . | jq -s .)
+          echo "Discovered apps: $json"
+          echo "matrix={\"app\":$json}" >> $GITHUB_OUTPUT
+
+  build:
+    needs: generate-matrix
+    runs-on: ubuntu-latest
+    strategy:
+      matrix: ${{ fromJson(needs.generate-matrix.outputs.matrix) }}
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y cmake ninja-build gperf \
+            ccache dfu-util device-tree-compiler wget \
+            python3-pip python3-setuptools git \
+            gcc g++ libncurses-dev libffi-dev \
+            libssl-dev python3-dev libglib2.0-dev \
+            libpixman-1-dev
+
+      - name: Install west and Zephyr dependencies
+        run: |
+          pip3 install west
+          west init -l .
+          west update
+          west zephyr-export
+          pip3 install -r zephyr/scripts/requirements.txt
+
+      - name: Build ${{ matrix.app }}
+        run: |
+          echo "🔧 Building ${{ matrix.app }}..."
+          west build -b native_sim ${{ matrix.app }} --build-dir ${{ matrix.app }}/build
+
