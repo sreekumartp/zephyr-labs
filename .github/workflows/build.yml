@@ -27,6 +27,21 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
+      - name: Cache west modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            .west
+            modules
+            zephyr
+          key: ${{ runner.os }}-west-${{ hashFiles('west.yml') }}
+
+      - name: Cache Zephyr SDK
+        uses: actions/cache@v3
+        with:
+          path: ~/zephyr-sdk
+          key: ${{ runner.os }}-zephyr-sdk-v0.16.4
+
       - name: Install dependencies
         run: |
           sudo apt update
@@ -35,7 +50,7 @@ jobs:
             python3-pip python3-setuptools git \
             gcc g++ libncurses-dev libffi-dev \
             libssl-dev python3-dev libglib2.0-dev \
-            libpixman-1-dev
+            libpixman-1-dev libc6-dev
 
       - name: Install west and Zephyr dependencies
         run: |
@@ -47,10 +62,12 @@ jobs:
 
       - name: Install Zephyr SDK
         run: |
-          wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.4/zephyr-sdk-0.16.4_linux-x86_64.tar.xz
-          tar xf zephyr-sdk-0.16.4_linux-x86_64.tar.xz
-          mv zephyr-sdk-0.16.4 $HOME/zephyr-sdk
-          $HOME/zephyr-sdk/setup.sh -h -c
+          if [ ! -d "$HOME/zephyr-sdk" ]; then
+            wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.4/zephyr-sdk-0.16.4_linux-x86_64.tar.xz
+            tar xf zephyr-sdk-0.16.4_linux-x86_64.tar.xz
+            mv zephyr-sdk-0.16.4 $HOME/zephyr-sdk
+            $HOME/zephyr-sdk/setup.sh -h -c
+          fi
 
       - name: Set Zephyr SDK env
         run: echo "ZEPHYR_SDK_INSTALL_DIR=$HOME/zephyr-sdk" >> $GITHUB_ENV
