@@ -1,0 +1,24 @@
+manifest:
+  defaults:
+    remote: zephyrproject  # 👈 Default remote used for projects below
+
+  remotes:
+    - name: zephyrproject  # 👈 Alias for GitHub Zephyr org
+      url-base: https://github.com/zephyrproject-rtos
+
+  projects:
+    # 👇 Zephyr RTOS source code
+    - name: zephyr
+      repo-path: zephyr
+      revision: main  # 👈 You can pin to a tag or SHA (e.g., v3.5.0)
+      import:
+        path-prefix: modules  # 👈 Automatically pulls Zephyr's own modules
+
+    # (Optional) Example of a shared external component
+    # - name: device-utils
+    #   repo-path: modules/device-utils
+    #   revision: main
+    #   remote: your-org
+
+  self:
+    path: .  # 👈 This monorepo is the "main application"
