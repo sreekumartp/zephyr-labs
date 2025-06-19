@@ -40,7 +40,7 @@ jobs:
       - name: Install west and Zephyr dependencies
         run: |
           pip3 install west
-          west init -l .
+          west init -m https://github.com/zephyrproject-rtos/zephyr
           west update
           west zephyr-export
           pip3 install -r zephyr/scripts/requirements.txt
