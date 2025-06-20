@@ -1,5 +1,5 @@
-#include <zephyr/ztest.h>
 #include "fsm.h"
+#include <zephyr/ztest.h>
 
 ZTEST(fsm_suite, test_default_state_is_idle)
 {

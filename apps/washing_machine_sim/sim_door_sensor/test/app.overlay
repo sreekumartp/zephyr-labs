@@ -1,0 +1,31 @@
+/*
+ * Copyright (c) 2024 Your Name
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This overlay is for the sim_door_sensor test environment.
+ * It provides the necessary 'sensor0' alias for the component under test.
+ */
+
+/ {
+    /*
+     * We only need to define the sensor alias that our component uses.
+     * The test will link it to the gpio0 controller provided by native_sim.
+     */
+    sensors {
+        compatible = "gpio-keys";
+
+        test_sensor_node: test_sensor_0 {
+            label = "Test Sensor";
+            gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
+        };
+    };
+
+
+    aliases {
+        /*
+         * This alias is what the sim_door_sensor.c component looks for.
+         * The #error directive will now be satisfied.
+         */
+        sensor0 = &test_sensor_node;
+    };
+};

@@ -1,0 +1,42 @@
+/*
+ * Copyright (c) 2024 Your Name
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * This overlay adds devices that USE the existing GPIO emulator
+ * provided by the native_sim board. It does not define a new one.
+ */
+
+/ {
+    /*
+     * We attach our virtual devices to the 'gpio0' controller
+     * which is the label for the GPIO emulator device in the board's dts.
+     */
+    leds {
+        compatible = "gpio-leds";
+        emulated_led: emulated_led_0 {
+            gpios = <&gpio0 0 GPIO_ACTIVE_HIGH>;
+            label = "Emulated Green LED";
+        };
+    };
+
+    sensors {
+        compatible = "gpio-keys";
+
+        sensor_0: sensor_0 {
+            label = "Proximity Sensor 1";
+            gpios = <&gpio0 1 GPIO_ACTIVE_HIGH>;
+        };
+
+        sensor_1: sensor_1 {
+            label = "Limit Switch Sensor 2";
+            gpios = <&gpio0 2 GPIO_ACTIVE_HIGH>;
+        };
+    };
+
+
+    aliases {
+        led0 = &emulated_led;
+        sensor0 = &sensor_0;
+        sensor1 = &sensor_1;
+    };
+};

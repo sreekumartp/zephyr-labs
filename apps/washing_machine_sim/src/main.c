@@ -6,6 +6,8 @@
 #include "shell_interface.h"
 
 
+
+
 int main(void) {
     printk("📘 Washing Machine Sim Started\n");
     door_sensor_sim_set_state(false);
@@ -26,4 +28,9 @@ int main(void) {
         k_sleep(K_MSEC(500));
     }
 
+}
+
+bool is_door_closed(void)
+{
+    return true;
 }
