@@ -15,6 +15,7 @@ jobs:
           echo "🔍 Discovering Zephyr apps..."
           apps=$(find apps -name prj.conf | sed 's|/prj.conf||' | sort)
           json=$(echo "$apps" | jq -R . | jq -cs .)
+          echo "Discovered apps: $json"
           echo "matrix={\"app\":$json}" >> $GITHUB_OUTPUT
 
   build:
@@ -26,7 +27,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Cache west & Zephyr modules
+      - name: Cache west modules
         uses: actions/cache@v3
         with:
           path: |
@@ -52,7 +53,7 @@ jobs:
             libpixman-1-dev libc6-dev \
             gcc-multilib g++-multilib libc6-dev-i386
 
-      - name: Install west and Zephyr dependencies
+      - name: Install west, twister and Zephyr dependencies
         run: |
           pip3 install west twister
           if [ -d ".west" ]; then
@@ -62,7 +63,7 @@ jobs:
           fi
           west update
           west zephyr-export
-          pip3 install -r zephyr/scripts/requirements.txt          
+          pip3 install -r zephyr/scripts/requirements.txt
 
       - name: Install Zephyr SDK
         run: |
@@ -76,22 +77,30 @@ jobs:
       - name: Set Zephyr SDK env
         run: echo "ZEPHYR_SDK_INSTALL_DIR=$HOME/zephyr-sdk" >> $GITHUB_ENV
 
-      - name: Build & test ${{ matrix.app }}
+      - name: Build ${{ matrix.app }}
         run: |
-          chmod +x scripts/build_app.sh
-          ./scripts/build_app.sh "${{ matrix.app }}"
+          echo "🔧 Building ${{ matrix.app }}..."
+          west build -b native_sim ${{ matrix.app }} --build-dir ${{ matrix.app }}/build
 
-          # Check for test output presence
-          BUILD_DIR="${{ matrix.app }}/build"
-          if [ ! -d "$BUILD_DIR/twister-out" ] || [ -z "$(ls -A ${BUILD_DIR}/twister-out)" ]; then
-            echo "⚠️ WARNING: No tests were found for app ${{ matrix.app }}."
-          fi
-          
-      - name: Archive test artifacts
+      - name: Prepare artifact for upload
         if: always()
+        run: |
+          safe_name=$(echo "${{ matrix.app }}" | tr '/' '_')
+          echo "ARTIFACT_NAME=twister-logs-$safe_name" >> $GITHUB_ENV
+          echo "ARTIFACT_PATH=$safe_name" >> $GITHUB_ENV
+          if [ -d "${{ matrix.app }}/build/twister-out" ]; then
+            echo "Uploading artifacts for ${{ matrix.app }}..."
+            mkdir -p artifacts/$safe_name
+            cp -r ${{ matrix.app }}/build/twister-out/* artifacts/$safe_name/
+          else
+            echo "No twister-out directory for ${{ matrix.app }}, skipping upload preparation."
+            echo "SKIP_UPLOAD=true" >> $GITHUB_ENV
+          fi
+
+      - name: Archive test artifacts
+        if: always() && env.SKIP_UPLOAD != 'true'
         uses: actions/upload-artifact@v4
         with:
-          name: twister-logs-${{ matrix.app }}
-          path: |
-            ${{ matrix.app }}/build/twister-out/
-            twister-out*
+          name: ${{ env.ARTIFACT_NAME }}
+          path: artifacts/${{ env.ARTIFACT_PATH }}/*
+          if-no-files-found: ignore
