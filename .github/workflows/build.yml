@@ -55,10 +55,14 @@ jobs:
       - name: Install west and Zephyr dependencies
         run: |
           pip3 install west twister
-          west init -m https://github.com/zephyrproject-rtos/zephyr .
+          if [ -d ".west" ]; then
+            echo ".west already exists, skipping west init"
+          else
+            west init -m https://github.com/zephyrproject-rtos/zephyr .
+          fi
           west update
           west zephyr-export
-          pip3 install -r zephyr/scripts/requirements.txt
+          pip3 install -r zephyr/scripts/requirements.txt          
 
       - name: Install Zephyr SDK
         run: |
