@@ -1,20 +1,39 @@
-#!/bin/bash
+#!/usr/bin/env bash
+set -euo pipefail
 
-# Usage: ./scripts/build_app.sh <app_name> <board>
-# Example: ./scripts/build_app.sh my_timer_app native_sim
-
-set -e
-
-APP_NAME=$1
-BOARD=$2
-
-if [ -z "$APP_NAME" ] || [ -z "$BOARD" ]; then
-  echo "Usage: $0 <app_name> <board>"
+APP_PATH=${1:-}
+if [[ -z "$APP_PATH" || ! -d "$APP_PATH" ]]; then
+  echo "❌ Usage: $0 <app-path>"
   exit 1
 fi
 
-BUILD_DIR="build/${APP_NAME}"
+# Build the app
+BUILD_DIR="$APP_PATH/build"
+echo "🔧 Building $APP_PATH → $BUILD_DIR"
+rm -rf "$BUILD_DIR"
+west build -b native_sim "$APP_PATH" --build-dir "$BUILD_DIR"
 
-echo "=== Building ${APP_NAME} for board ${BOARD} ==="
-west build -b "${BOARD}" "apps/${APP_NAME}" -d "${BUILD_DIR}"
+# Run tests via twister inside build dir
+pushd "$BUILD_DIR" >/dev/null
 
+echo "🧪 Running Twister tests..."
+if output=$(west twister \
+  -p native_sim \
+  -T "$PWD/../" \
+  --clobber-output \
+  --output-directory=twister-out 2>&1); then
+  echo "✅ Tests executed successfully"
+else
+  if echo "$output" | grep -q "No testsuites found at the specified location"; then
+    echo "⚠️ No tests found for $APP_PATH — skipping test execution"
+  else
+    echo "❌ Twister errored unexpectedly:"
+    echo "$output"
+    popd >/dev/null
+    exit 1
+  fi
+fi
+
+popd >/dev/null
+
+echo "✅ Build (+ test) complete for $APP_PATH"

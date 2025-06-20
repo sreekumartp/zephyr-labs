@@ -15,7 +15,6 @@ jobs:
           echo "🔍 Discovering Zephyr apps..."
           apps=$(find apps -name prj.conf | sed 's|/prj.conf||' | sort)
           json=$(echo "$apps" | jq -R . | jq -cs .)
-          echo "Discovered apps: $json"
           echo "matrix={\"app\":$json}" >> $GITHUB_OUTPUT
 
   build:
@@ -27,7 +26,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: Cache west modules
+      - name: Cache west & Zephyr modules
         uses: actions/cache@v3
         with:
           path: |
@@ -55,8 +54,8 @@ jobs:
 
       - name: Install west and Zephyr dependencies
         run: |
-          pip3 install west
-          west init -m https://github.com/zephyrproject-rtos/zephyr
+          pip3 install west twister
+          west init -m https://github.com/zephyrproject-rtos/zephyr .
           west update
           west zephyr-export
           pip3 install -r zephyr/scripts/requirements.txt
@@ -73,7 +72,22 @@ jobs:
       - name: Set Zephyr SDK env
         run: echo "ZEPHYR_SDK_INSTALL_DIR=$HOME/zephyr-sdk" >> $GITHUB_ENV
 
-      - name: Build ${{ matrix.app }}
+      - name: Build & test ${{ matrix.app }}
         run: |
-          echo "🔧 Building ${{ matrix.app }}..."
-          west build -b native_sim ${{ matrix.app }} --build-dir ${{ matrix.app }}/build
+          chmod +x scripts/build_app.sh
+          ./scripts/build_app.sh "${{ matrix.app }}"
+
+          # Check for test output presence
+          BUILD_DIR="${{ matrix.app }}/build"
+          if [ ! -d "$BUILD_DIR/twister-out" ] || [ -z "$(ls -A ${BUILD_DIR}/twister-out)" ]; then
+            echo "⚠️ WARNING: No tests were found for app ${{ matrix.app }}."
+          fi
+          
+      - name: Archive test artifacts
+        if: always()
+        uses: actions/upload-artifact@v3
+        with:
+          name: twister-logs-${{ matrix.app }}
+          path: |
+            ${{ matrix.app }}/build/twister-out/
+            twister-out*

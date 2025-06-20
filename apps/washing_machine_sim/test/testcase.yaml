@@ -1,0 +1,8 @@
+tests:
+  washing_machine_sim.fsm.transitions:
+    platform_allow:
+      - native_sim
+    tags: fsm
+    build_on_all: true
+    integration_platforms:
+      - native_sim

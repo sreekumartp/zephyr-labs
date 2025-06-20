@@ -1,0 +1,6 @@
+tests:
+  wachine_sim.waterlevel.low:
+    build_on_all: true
+    platform_allow:
+      - native_sim
+    tags: simulator
