@@ -7,7 +7,8 @@
 #include "shell_interface.h"
 
 
-static int fsm_state = FSM_STATE_IDLE;
+static fsm_state_t fsm_state = FSM_STATE_IDLE;
+
 static int counter = 0;
 
 int main(void) {
@@ -36,10 +37,6 @@ int main(void) {
         counter++;
         if (counter >= 4) { // 4 * 500ms = 2000ms = 2 seconds
             fsm_state = (fsm_state + 1) % FSM_STATE_MAX; // Cycle through states
-            // Ensure state stays within valid range
-            if (fsm_state < 0 || fsm_state >= FSM_STATE_MAX) {
-                fsm_state = FSM_STATE_IDLE;
-            }            
             counter = 0;
         }
         k_sleep(K_MSEC(500));

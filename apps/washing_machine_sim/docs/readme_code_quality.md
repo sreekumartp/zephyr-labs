@@ -8,7 +8,7 @@ This project follows continuous improvement practices for code quality, testing,
 
 | Metric         | Status       |
 |----------------|--------------|
-| CI Build       | ![CI](https://github.com/<your-org>/<your-repo>/actions/workflows/build.yml/badge.svg) |
+| CI Build       | ![CI](https://github.com/sreekumartp/zephyr-labs/actions/workflows/build.yml/badge.svg) |
 | Test Pass Rate | ✅ 100% (via Twister) |
 | Unit Tests     | `test_fsm`, `test_wm`, ... |
 

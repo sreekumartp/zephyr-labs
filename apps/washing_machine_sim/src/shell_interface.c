@@ -2,7 +2,13 @@
 #include <errno.h>
 #include "sim_door_sensor.h"
 #include "sim_water_level.h"
+
 static int cmd_door(const struct shell *sh, size_t argc, char **argv) {
+    if (argc < 2 || argv[1] == NULL) {
+        shell_print(sh, "❌ Missing argument. Use 'open' or 'close'");
+        return -EINVAL;
+    }
+
     if (strcmp(argv[1], "close") == 0) {
         door_sensor_sim_set_state(true);
         shell_print(sh, "Door state: closed");
@@ -13,11 +19,17 @@ static int cmd_door(const struct shell *sh, size_t argc, char **argv) {
         shell_print(sh, "❌ Invalid argument. Use 'open' or 'close'");
         return -EINVAL;
     }
+
     return 0;
 }
+
 SHELL_CMD_ARG_REGISTER(door, NULL, "door open|close", cmd_door, 2, 0);
 
 static int cmd_water(const struct shell *sh, size_t argc, char **argv) {
+    if (argc < 2 || argv[1] == NULL) {
+        shell_print(sh, "❌ Missing argument. Use 'empty' or 'full'");
+        return -EINVAL;
+    }
     if (strcmp(argv[1], "full") == 0) {
         water_level_sim_set_state(true);
         shell_print(sh, "Water level: full");
@@ -30,6 +42,7 @@ static int cmd_water(const struct shell *sh, size_t argc, char **argv) {
     }
     return 0;
 }
+
 SHELL_CMD_ARG_REGISTER(water, NULL, "water empty|full", cmd_water, 2, 0);
 
 static int cmd_door_state(const struct shell *sh, size_t argc, char **argv){
