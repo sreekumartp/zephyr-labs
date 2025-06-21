@@ -1,0 +1,45 @@
+@startuml
+actor User
+participant "WashingMachineApp" as App
+participant "FSM Controller" as FSM
+participant "Door Sensor (Sim)" as DoorSim
+participant "Water Inlet Valve (Sim)" as ValveSim
+participant "Water Level Sensor (Sim)" as LevelSim
+participant "Motor Controller (Sim)" as MotorSim
+participant "Drain Valve (Sim)" as DrainSim
+
+== User Starts Cycle ==
+User -> App : Press Start
+App -> FSM : fsm_event_start()
+
+== Safety Check ==
+FSM -> DoorSim : door_sensor_sim_get_state()
+DoorSim --> FSM : state = closed
+
+FSM -> FSM : transition_to(FILL)
+
+== Fill Water ==
+FSM -> ValveSim : water_valve_sim_open()
+loop until water is full
+    FSM -> LevelSim : water_level_sensor_get_state()
+    LevelSim --> FSM : not full
+end
+FSM -> ValveSim : water_valve_sim_close()
+FSM -> FSM : transition_to(AGITATE)
+
+== Agitate Clothes ==
+FSM -> MotorSim : motor_sim_start(AGITATE)
+FSM -> FSM : wait(duration = X minutes)
+FSM -> MotorSim : motor_sim_stop()
+FSM -> FSM : transition_to(DRAIN)
+
+== Drain Water ==
+FSM -> DrainSim : drain_valve_sim_open()
+loop until water is empty
+    FSM -> LevelSim : water_level_sensor_get_state()
+    LevelSim --> FSM : not empty
+end
+FSM -> DrainSim : drain_valve_sim_close()
+FSM -> FSM : transition_to(NEXT_STATE)
+
+@enduml

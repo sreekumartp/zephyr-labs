@@ -1,0 +1,34 @@
+@startuml
+actor User
+participant "MainThread" as Main
+participant "FSM_Thread"
+participant "DoorSensor_Thread"
+participant "WaterInlet_Thread"
+participant "WaterLevelSensor_Thread"
+
+== User Interaction ==
+User -> Main : Start Button Pressed
+Main -> FSM_Thread : fsm_event_start()
+
+== Door Check ==
+FSM_Thread -> DoorSensor_Thread : check_closed()
+DoorSensor_Thread --> FSM_Thread : closed = true
+
+FSM_Thread -> FSM_Thread : transition_to(FILL)
+
+== Start Filling ==
+FSM_Thread -> WaterInlet_Thread : open_valve()
+WaterInlet_Thread --> FSM_Thread : valve_opened
+
+== Wait for Fill ==
+loop polling cycle
+    FSM_Thread -> WaterLevelSensor_Thread : read_level()
+    WaterLevelSensor_Thread --> FSM_Thread : status = not_full
+end
+
+FSM_Thread -> WaterInlet_Thread : close_valve()
+WaterInlet_Thread --> FSM_Thread : valve_closed
+
+FSM_Thread -> FSM_Thread : transition_to(AGITATE)
+
+@enduml

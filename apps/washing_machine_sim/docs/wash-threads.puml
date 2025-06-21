@@ -1,0 +1,33 @@
+@startuml
+actor User
+participant "MainThread"
+participant "FSM_Thread"
+participant "Motor_Thread"
+participant "DoorSensor_Thread"
+participant "WaterLevelSensor_Thread"
+
+== Start Wash Cycle ==
+User -> MainThread : Press Start
+MainThread -> FSM_Thread : fsm_event_start()
+
+== Pre-Wash Safety Check ==
+FSM_Thread -> DoorSensor_Thread : door_sensor_sim_get_state()
+DoorSensor_Thread --> FSM_Thread : closed = true
+
+FSM_Thread -> WaterLevelSensor_Thread : water_level_sensor_get_state()
+WaterLevelSensor_Thread --> FSM_Thread : level = full
+
+FSM_Thread -> FSM_Thread : transition_to(AGITATE)
+
+== Motor Control Begins ==
+FSM_Thread -> Motor_Thread : start_motor(mode=AGITATE)
+
+loop wash_duration
+    FSM_Thread -> Motor_Thread : maintain_agitation()
+end
+
+FSM_Thread -> Motor_Thread : stop_motor()
+
+FSM_Thread -> FSM_Thread : transition_to(DRAIN)
+
+@enduml

@@ -1,0 +1,27 @@
+@startuml
+actor User
+participant "MainThread"
+participant "FSM_Thread"
+participant "DrainValve_Thread"
+participant "WaterLevelSensor_Thread"
+
+== Transition from Wash ==
+MainThread -> FSM_Thread : fsm_event_wash_complete()
+FSM_Thread -> FSM_Thread : transition_to(DRAIN)
+
+== Begin Drain Cycle ==
+FSM_Thread -> DrainValve_Thread : open_valve()
+DrainValve_Thread --> FSM_Thread : valve_opened
+
+== Monitor Water Level ==
+loop until water_level == empty
+    FSM_Thread -> WaterLevelSensor_Thread : read_water_level()
+    WaterLevelSensor_Thread --> FSM_Thread : not_empty
+end
+
+FSM_Thread -> DrainValve_Thread : close_valve()
+DrainValve_Thread --> FSM_Thread : valve_closed
+
+FSM_Thread -> FSM_Thread : transition_to(NEXT_STATE)
+
+@enduml
