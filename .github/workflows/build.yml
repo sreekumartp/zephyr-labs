@@ -18,7 +18,7 @@ jobs:
           echo "Discovered apps: $json"
           echo "matrix={\"app\":$json}" >> $GITHUB_OUTPUT
 
-  build:
+  build-apps:
     needs: generate-matrix
     runs-on: ubuntu-latest
     strategy:
@@ -26,7 +26,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v3
-
       - name: Cache west modules
         uses: actions/cache@v3
         with:
@@ -35,13 +34,11 @@ jobs:
             modules
             zephyr
           key: ${{ runner.os }}-west-${{ hashFiles('west.yml') }}
-
       - name: Cache Zephyr SDK
         uses: actions/cache@v3
         with:
           path: ~/zephyr-sdk
           key: ${{ runner.os }}-zephyr-sdk-v0.16.4
-
       - name: Install dependencies
         run: |
           sudo apt update
@@ -52,7 +49,6 @@ jobs:
             libssl-dev python3-dev libglib2.0-dev \
             libpixman-1-dev libc6-dev \
             gcc-multilib g++-multilib libc6-dev-i386
-
       - name: Install west, twister and Zephyr dependencies
         run: |
           pip3 install west twister
@@ -64,7 +60,6 @@ jobs:
           west update
           west zephyr-export
           pip3 install -r zephyr/scripts/requirements.txt
-
       - name: Install Zephyr SDK
         run: |
           if [ ! -d "$HOME/zephyr-sdk" ]; then
@@ -73,34 +68,69 @@ jobs:
             mv zephyr-sdk-0.16.4 $HOME/zephyr-sdk
             $HOME/zephyr-sdk/setup.sh -h -c
           fi
-
       - name: Set Zephyr SDK env
         run: echo "ZEPHYR_SDK_INSTALL_DIR=$HOME/zephyr-sdk" >> $GITHUB_ENV
-
       - name: Build ${{ matrix.app }}
         run: |
           echo "🔧 Building ${{ matrix.app }}..."
           west build -b native_sim ${{ matrix.app }} --build-dir ${{ matrix.app }}/build
 
-      - name: Prepare artifact for upload
-        if: always()
+  test-components:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Cache west modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            .west
+            modules
+            zephyr
+          key: ${{ runner.os }}-west-${{ hashFiles('west.yml') }}
+      - name: Cache Zephyr SDK
+        uses: actions/cache@v3
+        with:
+          path: ~/zephyr-sdk
+          key: ${{ runner.os }}-zephyr-sdk-v0.16.4
+      - name: Install dependencies
         run: |
-          safe_name=$(echo "${{ matrix.app }}" | tr '/' '_')
-          echo "ARTIFACT_NAME=twister-logs-$safe_name" >> $GITHUB_ENV
-          echo "ARTIFACT_PATH=$safe_name" >> $GITHUB_ENV
-          if [ -d "${{ matrix.app }}/build/twister-out" ]; then
-            echo "Uploading artifacts for ${{ matrix.app }}..."
-            mkdir -p artifacts/$safe_name
-            cp -r ${{ matrix.app }}/build/twister-out/* artifacts/$safe_name/
+          sudo apt update
+          sudo apt install -y cmake ninja-build gperf \
+            ccache dfu-util device-tree-compiler wget \
+            python3-pip python3-setuptools git \
+            gcc g++ libncurses-dev libffi-dev \
+            libssl-dev python3-dev libglib2.0-dev \
+            libpixman-1-dev libc6-dev \
+            gcc-multilib g++-multilib libc6-dev-i386
+      - name: Install west, twister and Zephyr dependencies
+        run: |
+          pip3 install west twister
+          if [ -d ".west" ]; then
+            echo ".west already exists, skipping west init"
           else
-            echo "No twister-out directory for ${{ matrix.app }}, skipping upload preparation."
-            echo "SKIP_UPLOAD=true" >> $GITHUB_ENV
+            west init -m https://github.com/zephyrproject-rtos/zephyr .
           fi
-
+          west update
+          west zephyr-export
+          pip3 install -r zephyr/scripts/requirements.txt
+      - name: Install Zephyr SDK
+        run: |
+          if [ ! -d "$HOME/zephyr-sdk" ]; then
+            wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.4/zephyr-sdk-0.16.4_linux-x86_64.tar.xz
+            tar xf zephyr-sdk-0.16.4_linux-x86_64.tar.xz
+            mv zephyr-sdk-0.16.4 $HOME/zephyr-sdk
+            $HOME/zephyr-sdk/setup.sh -h -c
+          fi
+      - name: Set Zephyr SDK env
+        run: echo "ZEPHYR_SDK_INSTALL_DIR=$HOME/zephyr-sdk" >> $GITHUB_ENV
+      - name: Run event_bus tests
+        run: |
+          echo "🧪 Running event_bus tests..."
+          west twister -p native_sim -T components/event_bus/tests --inline-logs
       - name: Archive test artifacts
-        if: always() && env.SKIP_UPLOAD != 'true'
+        if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: ${{ env.ARTIFACT_NAME }}
-          path: artifacts/${{ env.ARTIFACT_PATH }}/*
+          name: twister-logs-event-bus
+          path: twister-out
           if-no-files-found: ignore
