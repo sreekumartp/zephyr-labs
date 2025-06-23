@@ -5,6 +5,7 @@ modules/
 tools/
 twister-out/
 twister-log.xml
+twister*
 
 # 🧪 Optional for test outputs
 *.gcda

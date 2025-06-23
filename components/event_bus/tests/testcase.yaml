@@ -1,0 +1,10 @@
+tests:
+  event.bus.suite:
+    tags:
+      - event_bus
+      - library
+    # The test should run on a simulated platform like QEMU
+    platform_allow: native_sim
+    # Define the integration workflow
+    integration_platforms:
+      - native_sim
