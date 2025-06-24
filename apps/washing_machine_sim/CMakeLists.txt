@@ -5,11 +5,13 @@ project(washing_machine_sim)
 # Add core and simulator source files
 target_sources(app PRIVATE
     src/main.c
-    src/fsm.c
     src/shell_interface.c
     sim_door_sensor/src/sim_door_sensor.c
     sim_water_level/src/sim_water_level.c
 )
+# Add the FSM module as a subdirectory
+add_subdirectory(fsm)
+
 # Add include directory to find fgearders
 zephyr_include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/include

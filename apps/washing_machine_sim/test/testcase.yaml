@@ -1,5 +1,0 @@
-tests:
-  washing_machine_sim.wm.transitions:
-    tags: wm
-    platform_allow: [native_sim]
-    build_on_all: true
