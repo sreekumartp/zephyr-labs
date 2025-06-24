@@ -134,3 +134,41 @@ jobs:
           name: twister-logs-event-bus
           path: twister-out
           if-no-files-found: ignore
+
+  test-washing-machine-fsm:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      # ... (steps for caching and dependency installation are identical to build-apps)
+      - name: Install west, twister and Zephyr dependencies
+        run: |
+          pip3 install west twister
+          if [ -d ".west" ]; then
+            echo ".west already exists, skipping west init"
+          else
+            west init -m https://github.com/zephyrproject-rtos/zephyr .
+          fi
+          west update
+          west zephyr-export
+          pip3 install -r zephyr/scripts/requirements.txt
+      - name: Install Zephyr SDK
+        run: |
+          if [ ! -d "$HOME/zephyr-sdk" ]; then
+            wget https://github.com/zephyrproject-rtos/sdk-ng/releases/download/v0.16.4/zephyr-sdk-0.16.4_linux-x86_64.tar.xz
+            tar xf zephyr-sdk-0.16.4_linux-x86_64.tar.xz
+            mv zephyr-sdk-0.16.4 $HOME/zephyr-sdk
+            $HOME/zephyr-sdk/setup.sh -h -c
+          fi
+      - name: Set Zephyr SDK env
+        run: echo "ZEPHYR_SDK_INSTALL_DIR=$HOME/zephyr-sdk" >> $GITHUB_ENV
+      - name: Run FSM unit tests
+        run: |
+          echo "🧪 Running Washing Machine FSM tests..."
+          west twister -p native_sim -T apps/washing_machine_sim/fsm/tests --inline-logs
+      - name: Archive FSM test artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: twister-logs-fsm
+          path: twister-out
+          if-no-files-found: ignore
