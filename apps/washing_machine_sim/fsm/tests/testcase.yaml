@@ -3,6 +3,7 @@ tests:
     tags: 
       - fsm
       - l1
+      - l2
     # This test is pure logic and can run on the fast native_posix target
     platform_allow: native_sim
     integration_platforms:

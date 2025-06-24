@@ -11,6 +11,8 @@ project(l1_fsm_test)
 target_sources(app PRIVATE
     src/test_l1_system_fsm.c
     ../src/l1_system_fsm.c
+    src/test_l2_wash_cycle_fsm.c
+    ../src/l2_wash_cycle_fsm.c    
     )
 
 # The test requires the parent FSM include directory to find the header files

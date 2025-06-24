@@ -3,6 +3,7 @@ build/
 zephyr/
 modules/
 tools/
+bootloader/
 twister-out/
 twister-log.xml
 twister*
