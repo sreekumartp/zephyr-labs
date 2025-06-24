@@ -42,7 +42,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y cmake ninja-build gperf \
+          sudo apt install -y build-essential cmake ninja-build gperf \
             ccache dfu-util device-tree-compiler wget \
             python3-pip python3-setuptools git \
             gcc g++ libncurses-dev libffi-dev \
@@ -95,7 +95,7 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt update
-          sudo apt install -y cmake ninja-build gperf \
+          sudo apt install -y build-essential cmake ninja-build gperf \
             ccache dfu-util device-tree-compiler wget \
             python3-pip python3-setuptools git \
             gcc g++ libncurses-dev libffi-dev \
@@ -139,7 +139,29 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-      # ... (steps for caching and dependency installation are identical to build-apps)
+      - name: Cache west modules
+        uses: actions/cache@v3
+        with:
+          path: |
+            .west
+            modules
+            zephyr
+          key: ${{ runner.os }}-west-${{ hashFiles('west.yml') }}
+      - name: Cache Zephyr SDK
+        uses: actions/cache@v3
+        with:
+          path: ~/zephyr-sdk
+          key: ${{ runner.os }}-zephyr-sdk-v0.16.4
+      - name: Install dependencies
+        run: |
+          sudo apt update
+          sudo apt install -y build-essential cmake ninja-build gperf \
+            ccache dfu-util device-tree-compiler wget \
+            python3-pip python3-setuptools git \
+            gcc g++ libncurses-dev libffi-dev \
+            libssl-dev python3-dev libglib2.0-dev \
+            libpixman-1-dev libc6-dev \
+            gcc-multilib g++-multilib libc6-dev-i386
       - name: Install west, twister and Zephyr dependencies
         run: |
           pip3 install west twister
