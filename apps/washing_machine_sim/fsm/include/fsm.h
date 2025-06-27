@@ -2,6 +2,8 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include "event_defs.h" // For event_id_t and event_payload_t
+
 
 // --- Level 1: System Mode States ---
 typedef enum {
@@ -37,24 +39,26 @@ typedef enum {
 } wash_cycle_state_t;
 
 // --- System-Wide Events (Triggers) ---
-typedef enum {
-    EVENT_POWER_BUTTON_PRESSED,
-    EVENT_CYCLE_SELECTED,
-    EVENT_START_BUTTON_PRESSED,
-    EVENT_PAUSE_BUTTON_PRESSED,
-    EVENT_CANCEL_BUTTON_PRESSED,
-    EVENT_ANY_KEY_PRESSED,
-    EVENT_WEIGHT_CALCULATED,
-    EVENT_DOSING_COMPLETE,
-    EVENT_TIMER_EXPIRED,
-    EVENT_DRUM_EMPTY,
-    EVENT_WATER_LEVEL_REACHED,
-    EVENT_TEMP_REACHED,
-    EVENT_POWER_LOSS_DETECTED,
-    EVENT_POWER_RESTORED,
-    EVENT_FATAL_FAULT_DETECTED,
-    EVENT_CYCLE_FINISHED,
-} fsm_event_t;
+// typedef enum {
+//     EVENT_POWER_BUTTON_PRESSED,
+//     EVENT_CYCLE_SELECTED,
+//     EVENT_START_BUTTON_PRESSED,
+//     EVENT_PAUSE_BUTTON_PRESSED,
+//     EVENT_CANCEL_BUTTON_PRESSED,
+//     EVENT_ANY_KEY_PRESSED,
+//     EVENT_WEIGHT_CALCULATED,
+//     EVENT_DOSING_COMPLETE,
+//     EVENT_TIMER_EXPIRED,
+//     EVENT_DRUM_EMPTY,
+//     EVENT_WATER_LEVEL_REACHED,
+//     EVENT_TEMP_REACHED,
+//     EVENT_POWER_LOSS_DETECTED,
+//     EVENT_POWER_RESTORED,
+//     EVENT_FATAL_FAULT_DETECTED,
+//     EVENT_CYCLE_FINISHED,
+//     EVENT_STEAM_READY,
+//     EVENT_STEAM_COMPLETE,
+// } fsm_event_t;
 
 // --- FSM Handle ---
 typedef struct {
@@ -68,7 +72,7 @@ typedef struct {
 
 // --- Public API Functions ---
 void fsm_init(fsm_handle_t *fsm);
-void fsm_process_event(fsm_handle_t *fsm, fsm_event_t event);
+void fsm_process_event(fsm_handle_t *fsm, event_id_t event);
 const char* fsm_get_system_state_name(system_state_t state);
 const char* fsm_get_wash_cycle_state_name(wash_cycle_state_t state);
 

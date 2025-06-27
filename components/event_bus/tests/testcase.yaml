@@ -1,10 +1,15 @@
 tests:
-  event.bus.suite:
-    tags:
-      - event_bus
-      - library
-    # The test should run on a simulated platform like QEMU
+  libraries.event_bus.polling:
+    tags: event_bus
+    # This test scenario enables the polling configuration
+    extra_configs:
+      - CONFIG_EVENT_BUS_USE_POLLING=y
     platform_allow: native_sim
-    # Define the integration workflow
-    integration_platforms:
-      - native_sim
+
+  libraries.event_bus.callback:
+    tags: event_bus
+    # This test scenario enables the callback configuration
+    extra_configs:
+      - CONFIG_EVENT_BUS_USE_CALLBACK=y
+      - CONFIG_SYSTEM_WORKQUEUE_STACK_SIZE=2048
+    platform_allow: native_sim

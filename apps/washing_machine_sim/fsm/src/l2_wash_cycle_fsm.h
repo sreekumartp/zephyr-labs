@@ -33,4 +33,4 @@ void l2_fsm_start(fsm_handle_t *fsm);
  * @param fsm A pointer to the FSM handle.
  * @param event The event to process.
  */
-void l2_wash_cycle_process_event(fsm_handle_t *fsm, fsm_event_t event);
+void l2_wash_cycle_process_event(fsm_handle_t *fsm, event_id_t event);

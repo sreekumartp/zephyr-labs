@@ -1,3 +1,4 @@
+#include "fsm.h"
 #include "l1_system_fsm.h"
 #include "l2_wash_cycle_fsm.h" // L1 needs to start/reset L2
 
@@ -8,7 +9,7 @@ void l1_fsm_init(fsm_handle_t *fsm)
     }
 }
 
-bool l1_system_process_override_events(fsm_handle_t *fsm, fsm_event_t event)
+bool l1_system_process_override_events(fsm_handle_t *fsm, event_id_t event)
 {
     if (!fsm || fsm->system_state != STATE_L1_RUNNING) {
         return false;
@@ -30,7 +31,7 @@ bool l1_system_process_override_events(fsm_handle_t *fsm, fsm_event_t event)
     }
 }
 
-void l1_system_process_event(fsm_handle_t *fsm, fsm_event_t event)
+void l1_system_process_event(fsm_handle_t *fsm, event_id_t event)
 {
     if (!fsm) {
         return;
@@ -100,4 +101,12 @@ void l1_system_process_event(fsm_handle_t *fsm, fsm_event_t event)
             // No action needed for other states
             break;
     }
+}
+
+system_state_t system_fsm_get_state(const fsm_handle_t *fsm)
+{
+    if (fsm) {
+        return fsm->system_state;
+    }
+    return STATE_L1_POWER_OFF; // Default state if fsm is NULL
 }

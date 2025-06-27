@@ -32,7 +32,7 @@ __weak void l2_fsm_start(fsm_handle_t *fsm_handle)
 
 // This mock is not strictly required for L1 testing, but included for completeness
 // if any test path were to accidentally call it.
-__weak void l2_wash_cycle_process_event(fsm_handle_t *fsm, fsm_event_t event)
+__weak void l2_wash_cycle_process_event(fsm_handle_t *fsm, event_id_t event)
 {
     // Do nothing in the L1 tests.
 }

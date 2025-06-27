@@ -1,49 +1,35 @@
 #include <zephyr/kernel.h>
-#include <zephyr/sys/printk.h>
-
-#include "sim_door_sensor.h"
-#include "sim_water_level.h"
-#include "fsm.h" // Include the new public FSM header
+#include <zephyr/logging/log.h>
+#include "event_bus.h"
+#include "controller_thread.h"
 #include "shell_interface.h"
 
-
-// Create a handle for our hierarchical state machine
-static fsm_handle_t fsm;
+LOG_MODULE_REGISTER(main, LOG_LEVEL_INF);
 
 int main(void) {
-    printk("📘 Washing Machine Sim Started\n");
-    
-    int ret;
+    LOG_INF("System Init: Main");
 
-	/* Initialize the component under test. */
-    ret = door_sensor_sim_init();
-    __ASSERT(ret == 0, "door_sensor_sim_init() failed with code %d", ret);
-    printk("Door sensor simulation initialization status: %d\n", ret);
-
-    wm_shell_init();
-
-    // Initialize the new FSM to its starting state (POWER_OFF)
-    fsm_init(&fsm);
-    printk("FSM Initialized. System State: %s\n", fsm_get_system_state_name(fsm.system_state));
-
-
-    // Main application loop
-    while (1) {
-        // --- TODO ---
-        // This is where the application's main logic will go.
-        // It will be responsible for:
-        // 1. Reading events from sensors, timers, and the event bus.
-        // 2. Calling fsm_process_event(&fsm, received_event);
-        // 3. Executing actions based on the new state (e.g., turning on the motor).
-
-        k_sleep(K_MSEC(1000));
+    // Initialize the event bus first, as others depend on it.
+    if (event_bus_init() != 0) {
+        LOG_ERR("Failed to initialize event bus!");
+        return 1;
     }
 
-    return 0; // Will not be reached
-}
+    // Initialize our new FSM controller thread.
+    // This will register the callback and start the thread.
+    if (controller_thread_init() != 0) {
+        LOG_ERR("Failed to initialize controller thread!");
+        return 1;
+    }
 
-// This function is no longer used by the new FSM but kept for reference
-bool is_door_closed(void)
-{
-    return true;
+    // Initialize the shell for user input.
+    shell_interface_init();
+
+    LOG_INF("All components initialized. System is now running.");
+
+    // The main thread can now sleep, as all work is done in other threads.
+    while (1) {
+        k_sleep(K_FOREVER);
+    }
+    return 0; // Should never reach here
 }

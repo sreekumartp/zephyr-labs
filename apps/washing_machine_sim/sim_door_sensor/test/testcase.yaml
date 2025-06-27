@@ -1,5 +1,5 @@
 tests:
-  wachine_sim.doorsensor.open:
+  wachine.sim.suite:
     build_on_all: true
     platform_allow:
       - native_sim
