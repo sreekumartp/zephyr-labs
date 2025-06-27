@@ -47,13 +47,13 @@ ZTEST(l2_fsm_suite, test_full_cycle_path_no_options)
     zassert_equal(fsm.wash_cycle_state, STATE_L2_PREWASH_CHECK, "Failed transition to Prewash Check");
 
     // Process the check state (which is synchronous and should immediately transition)
-    l2_wash_cycle_process_event(&fsm, (fsm_event_t)0); // Event doesn't matter for check states
+    l2_wash_cycle_process_event(&fsm, 0); // Event doesn't matter for check states
     zassert_equal(fsm.wash_cycle_state, STATE_L2_FILLING, "Should have skipped Prewash");
 
     l2_wash_cycle_process_event(&fsm, EVENT_WATER_LEVEL_REACHED);
     zassert_equal(fsm.wash_cycle_state, STATE_L2_HEATING_CHECK, "Failed transition to Heating Check");
 
-    l2_wash_cycle_process_event(&fsm, (fsm_event_t)0);
+    l2_wash_cycle_process_event(&fsm, 0);
     zassert_equal(fsm.wash_cycle_state, STATE_L2_WASHING, "Should have skipped Heating");
 
     l2_wash_cycle_process_event(&fsm, EVENT_TIMER_EXPIRED);
@@ -71,7 +71,7 @@ ZTEST(l2_fsm_suite, test_full_cycle_path_no_options)
     l2_wash_cycle_process_event(&fsm, EVENT_TIMER_EXPIRED);
     zassert_equal(fsm.wash_cycle_state, STATE_L2_STEAM_CHECK, "Failed transition to Steam Check");
 
-    l2_wash_cycle_process_event(&fsm, (fsm_event_t)0);
+    l2_wash_cycle_process_event(&fsm, 0);
     zassert_equal(fsm.wash_cycle_state, STATE_L2_COMPLETE, "Should have skipped Steam");
 }
 
@@ -81,7 +81,7 @@ ZTEST(l2_fsm_suite, test_prewash_path_is_taken)
     fsm.program_has_prewash = true;
     fsm.wash_cycle_state = STATE_L2_PREWASH_CHECK;
 
-    l2_wash_cycle_process_event(&fsm, (fsm_event_t)0);
+    l2_wash_cycle_process_event(&fsm, 0);
     zassert_equal(fsm.wash_cycle_state, STATE_L2_PREWASH, "Did not enter Prewash state when required");
 }
 
@@ -91,7 +91,7 @@ ZTEST(l2_fsm_suite, test_heating_path_is_taken)
     fsm.program_has_heating = true;
     fsm.wash_cycle_state = STATE_L2_HEATING_CHECK;
 
-    l2_wash_cycle_process_event(&fsm, (fsm_event_t)0);
+    l2_wash_cycle_process_event(&fsm, 0);
     zassert_equal(fsm.wash_cycle_state, STATE_L2_HEATING, "Did not enter Heating state when required");
 }
 

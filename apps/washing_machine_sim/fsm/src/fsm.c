@@ -17,7 +17,7 @@ void fsm_init(fsm_handle_t *fsm)
     }
 }
 
-void fsm_process_event(fsm_handle_t *fsm, fsm_event_t event)
+void fsm_process_event(fsm_handle_t *fsm, event_id_t event)
 {
     if (!fsm) {
         return;

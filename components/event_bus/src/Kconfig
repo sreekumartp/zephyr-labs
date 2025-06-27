@@ -1,0 +1,25 @@
+# Kconfig for the Event Bus component
+
+choice EVENT_BUS_SUBSCRIBER_TYPE
+    prompt "Event Bus Subscriber Mechanism"
+    default EVENT_BUS_USE_CALLBACK
+    help
+      Select the subscriber mechanism for the event bus. This choice
+      is mutually exclusive.
+
+    config EVENT_BUS_USE_POLLING
+        bool "Polling (Message Queue) based subscribers"
+        help
+          This option enables a dispatcher thread that forwards events
+          to subscriber-specific message queues. Each subscriber must
+          have its own thread to poll its queue.
+
+    config EVENT_BUS_USE_CALLBACK
+        bool "Callback (Work Queue) based subscribers"
+        help
+          This option enables a system where callbacks are registered
+          and executed from a dedicated worker thread pool (work queue).
+          This is generally more memory efficient as subscribers do not
+          need their own dedicated threads.
+
+endchoice

@@ -6,10 +6,15 @@ project(sim_door_sensor_test)
 # Include the header from the sim_door_sensor implementation
 zephyr_include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/../include
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../../components/event_bus/include
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../fsm/include
 )
 
 # Link test source and implementation source
 target_sources(app PRIVATE
-  src/test_sim_door_sensor.c
-  ../src/sim_door_sensor.c
+  # src/test_sim_door_sensor.c
+  # ../src/sim_door_sensor.c
+  ${CMAKE_CURRENT_SOURCE_DIR}/../../../../components/event_bus/src/event_bus.c
+  ../src/sensor_door_thread.c
+  src/ztest_sensor_door.c
 )

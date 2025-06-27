@@ -1,62 +1,60 @@
 #include <zephyr/shell/shell.h>
-#include <errno.h>
-#include "sim_door_sensor.h"
-#include "sim_water_level.h"
+#include <zephyr/logging/log.h>
+#include <stdlib.h>
+#include "event_defs.h"
+#include "event_bus.h"
+#include "shell_interface.h"
+#include "fsm.h"
 
-static int cmd_door(const struct shell *sh, size_t argc, char **argv) {
-    if (argc < 2 || argv[1] == NULL) {
-        shell_print(sh, "❌ Missing argument. Use 'open' or 'close'");
-        return -EINVAL;
-    }
+LOG_MODULE_REGISTER(shell_interface, LOG_LEVEL_INF);
 
-    if (strcmp(argv[1], "close") == 0) {
-        door_sensor_sim_set_state(true);
-        shell_print(sh, "Door state: closed");
-    } else if (strcmp(argv[1], "open") == 0) {
-        door_sensor_sim_set_state(false);
-        shell_print(sh, "Door state: open");
-    } else {
-        shell_print(sh, "❌ Invalid argument. Use 'open' or 'close'");
-        return -EINVAL;
-    }
+static int cmd_start(const struct shell *shell, size_t argc, char **argv) {
+    ARG_UNUSED(argc);
+    ARG_UNUSED(argv);
 
+    LOG_INF("Start button pressed, publishing event...");
+    // Create and post the event for starting the wash cycle
+    // This event can be handled by the FSM or any other component that listens for it
+    // Here we use EVENT_START_BUTTON_PRESSED as the event ID
+    // and a sample payload of 456 (could be any relevant data)
+    // In a real application, you might want to pass more meaningful data in the payload    
+    const app_event_t event = { .id = EVENT_START_BUTTON_PRESSED, .payload.s32 = 456 };
+    event_bus_post(&event);
+    shell_print(shell, "Start button event published.");
     return 0;
 }
 
-SHELL_CMD_ARG_REGISTER(door, NULL, "door open|close", cmd_door, 2, 0);
+SHELL_CMD_REGISTER(start, NULL, "Start the wash cycle (event-based)", cmd_start);
 
-static int cmd_water(const struct shell *sh, size_t argc, char **argv) {
-    if (argc < 2 || argv[1] == NULL) {
-        shell_print(sh, "❌ Missing argument. Use 'empty' or 'full'");
+// --- Shell Command to Send an Event ---
+
+static int cmd_send_event(const struct shell *shell, size_t argc, char **argv)
+{
+    if (argc < 2) {
+        shell_error(shell, "Please provide an event ID (integer).");
         return -EINVAL;
     }
-    if (strcmp(argv[1], "full") == 0) {
-        water_level_sim_set_state(true);
-        shell_print(sh, "Water level: full");
-    } else if (strcmp(argv[1], "empty") == 0) {
-        water_level_sim_set_state(false);
-        shell_print(sh, "Water level: empty");
-    } else {
-        shell_print(sh, "❌ Invalid argument. Use 'empty' or 'full'");
+
+    event_id_t event_id = (event_id_t)atoi(argv[1]);
+
+    // Simple check to prevent sending wildly invalid event IDs.
+    // This could be made more robust if needed.
+    if (event_id >= EVENT_ID_COUNT) {
+        shell_error(shell, "Invalid event ID: %d", event_id);
         return -EINVAL;
     }
+
+    const app_event_t event_to_post = { .id = event_id };
+
+    event_bus_post(&event_to_post);
+    shell_print(shell, "Posted event with ID: %d", event_id);
+
     return 0;
 }
+// Register the "send" command with subcommands for each event type
+// This makes the shell interface user-friendly and self-documenting.
+SHELL_CMD_REGISTER(send_event, NULL, "Send a specific event to the event bus", cmd_send_event);
 
-SHELL_CMD_ARG_REGISTER(water, NULL, "water empty|full", cmd_water, 2, 0);
-
-static int cmd_door_state(const struct shell *sh, size_t argc, char **argv){
-    bool state = door_sensor_sim_get_state();
-    shell_print(sh, "Door is currently: %s", state ? "closed" : "open");
-    return 0;
+void shell_interface_init(void) {
+    // Nothing needed for now
 }
-SHELL_CMD_REGISTER(door_state, NULL, "Get current door state", cmd_door_state);
-
-static int cmd_water_state(const struct shell *sh, size_t argc, char **argv){
-    bool state = water_level_sim_get_state();
-    shell_print(sh, "Water level is currently: %s", state ? "full" : "empty");
-    return 0;
-}
-SHELL_CMD_REGISTER(water_state, NULL, "Get current water level", cmd_water_state);
-
-void wm_shell_init(void) { /* Trigger shell if needed */ }

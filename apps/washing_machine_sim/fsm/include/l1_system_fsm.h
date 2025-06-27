@@ -19,7 +19,7 @@ void l1_fsm_init(fsm_handle_t *fsm);
  * @param event The event to process.
  * @return True if the event was handled as an override, false otherwise.
  */
-bool l1_system_process_override_events(fsm_handle_t *fsm, fsm_event_t event);
+bool l1_system_process_override_events(fsm_handle_t *fsm, event_id_t event);
 
 /**
  * @brief Processes a standard event for the L1 System FSM.
@@ -30,4 +30,8 @@ bool l1_system_process_override_events(fsm_handle_t *fsm, fsm_event_t event);
  * @param fsm A pointer to the FSM handle.
  * @param event The event to process.
  */
-void l1_system_process_event(fsm_handle_t *fsm, fsm_event_t event);
+void l1_system_process_event(fsm_handle_t *fsm, event_id_t event);
+
+
+// Returns current FSM state for testing/logging/debugging
+system_state_t system_fsm_get_state(const fsm_handle_t *fsm);
