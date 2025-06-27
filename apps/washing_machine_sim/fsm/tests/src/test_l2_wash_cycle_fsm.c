@@ -71,7 +71,7 @@ ZTEST(l2_fsm_suite, test_full_cycle_path_no_options)
     l2_wash_cycle_process_event(&fsm, EVENT_TIMER_EXPIRED);
     zassert_equal(fsm.wash_cycle_state, STATE_L2_STEAM_CHECK, "Failed transition to Steam Check");
 
-    l2_wash_cycle_process_event(&fsm, 0);
+    l2_wash_cycle_process_event(&fsm, EVENT_UNKNOWN); // No steam, so this should skip
     zassert_equal(fsm.wash_cycle_state, STATE_L2_COMPLETE, "Should have skipped Steam");
 }
 
@@ -81,7 +81,7 @@ ZTEST(l2_fsm_suite, test_prewash_path_is_taken)
     fsm.program_has_prewash = true;
     fsm.wash_cycle_state = STATE_L2_PREWASH_CHECK;
 
-    l2_wash_cycle_process_event(&fsm, 0);
+    l2_wash_cycle_process_event(&fsm, EVENT_DOSING_COMPLETE);
     zassert_equal(fsm.wash_cycle_state, STATE_L2_PREWASH, "Did not enter Prewash state when required");
 }
 
@@ -91,7 +91,7 @@ ZTEST(l2_fsm_suite, test_heating_path_is_taken)
     fsm.program_has_heating = true;
     fsm.wash_cycle_state = STATE_L2_HEATING_CHECK;
 
-    l2_wash_cycle_process_event(&fsm, 0);
+    l2_wash_cycle_process_event(&fsm, EVENT_TEMP_REACHED);
     zassert_equal(fsm.wash_cycle_state, STATE_L2_HEATING, "Did not enter Heating state when required");
 }
 
@@ -101,7 +101,7 @@ ZTEST(l2_fsm_suite, test_steam_path_is_taken)
     fsm.program_has_steam = true;
     fsm.wash_cycle_state = STATE_L2_STEAM_CHECK;
 
-    l2_wash_cycle_process_event(&fsm, (fsm_event_t)0);
+    l2_wash_cycle_process_event(&fsm, EVENT_STEAM_READY);
     zassert_equal(fsm.wash_cycle_state, STATE_L2_STEAMING, "Did not enter Steaming state when required");
 }
 

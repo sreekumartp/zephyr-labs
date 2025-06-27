@@ -12,7 +12,7 @@ LOG_MODULE_REGISTER(test_multithreaded, LOG_LEVEL_INF);
 ZTEST(multithreaded_tests, test_start_button_event_triggers_fsm)
 {
     event_t event = { .type = EVENT_START_BUTTON_PRESSED };
-    int ret = event_bus_publish(&event);
+    int ret = event_bus_post(&event);
     zassert_equal(ret, 0, "Failed to publish EVENT_START_BUTTON_PRESSED");
 
     k_sleep(K_MSEC(100));
