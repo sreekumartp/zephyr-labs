@@ -1,6 +1,6 @@
 # 🛠 Zephyr build and dependency folders
 build/
-zephyr/
+
 modules/
 tools/
 bootloader/
