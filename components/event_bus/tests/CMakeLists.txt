@@ -6,13 +6,6 @@ find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(event_bus_ztest)
 
 
-
-# Include the Zephyr module for the event bus component.
-# This is necessary to ensure that the component's library is built and linked correctly.
-# The path is relative to the current CMakeLists.txt file.
-# This line is critical and must come first.
-# list(APPEND ZEPHYR_EXTRA_MODULES ${CMAKE_CURRENT_SOURCE_DIR}/../../event_bus)
-
 # The test needs access to the component's public headers.
 target_include_directories(app PRIVATE
     ../../include
