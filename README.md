@@ -321,12 +321,12 @@ jobs:
 ### 📊 Quality Metrics and Monitoring
 
 **Code Quality Metrics:**
-- **Test Coverage**: Maintain >80% code coverage across all components
-- **Cyclomatic Complexity**: Keep functions below complexity threshold (10)
-- **Memory Usage**: Monitor RAM and flash usage per application
-- **Performance Benchmarks**: Track execution time and response latencies
+- TODO:  **Test Coverage**: Maintain >80% code coverage across all components   
+- TODO: **Cyclomatic Complexity**: Keep functions below complexity threshold (10)
+- TODO: **Memory Usage**: Monitor RAM and flash usage per application
+- TODO: **Performance Benchmarks**: Track execution time and response latencies
 
-**Automated Quality Checks:**
+TODO: **Automated Quality Checks:**
 ```bash
 # Static analysis
 west build -t cppcheck
@@ -341,13 +341,13 @@ west build -t coverage_report
 
 ### 🔒 Security and Safety Practices
 
-**Secure Development:**
+TODO: **Secure Development:**
 - **MISRA C Compliance**: Adherence to safety-critical coding standards
 - **Static Security Analysis**: Regular security vulnerability scanning
 - **Memory Protection**: Use of memory protection units and stack guards
 - **Secure Boot**: MCUboot integration for verified boot processes
 
-**Safety-Critical Features:**
+TODO: **Safety-Critical Features:**
 - **Watchdog Integration**: System health monitoring and recovery
 - **Fault Injection Testing**: Deliberate error introduction for robustness testing
 - **Error Handling Validation**: Comprehensive error condition testing
@@ -355,11 +355,11 @@ west build -t coverage_report
 
 ## 🚀 Advanced Features
 
-### Multi-Board Support
+PARTIAL: ### Multi-Board Support
 - **Native Simulation**: Hardware-independent development
-- **Nordic nRF Series**: Bluetooth and wireless applications
-- **STM32 Boards**: ARM Cortex-M development
-- **ESP32**: Wi-Fi and IoT connectivity
+- TODO: **Nordic nRF Series**: Bluetooth and wireless applications
+- TODO: **STM32 Boards**: ARM Cortex-M development
+- TODO: **ESP32**: Wi-Fi and IoT connectivity
 
 ### Development Tools
 - **VS Code Integration**: IntelliSense and debugging support
@@ -367,15 +367,12 @@ west build -t coverage_report
 - **MCUboot Support**: Secure bootloader integration
 - **Shell Commands**: Runtime system inspection
 
-### Performance Optimization
+TODO: ### Performance Optimization
 - **Memory Profiling**: RAM and flash usage analysis
 - **Timing Analysis**: Real-time performance measurement
 - **Resource Monitoring**: Thread and queue utilization
 - **Power Management**: Low-power design patterns
 
-## 🤝 Contributing
-
-We welcome contributions and maintain high software engineering standards! Please follow these guidelines:
 
 ### Development Workflow
 
@@ -392,7 +389,7 @@ We welcome contributions and maintain high software engineering standards! Pleas
 - Follow Zephyr coding conventions and MISRA C guidelines
 - Use meaningful variable and function names
 - Include comprehensive comments and API documentation
-- Maintain cyclomatic complexity below 10 per function
+- TODO: Maintain cyclomatic complexity below 10 per function
 - Ensure thread-safety in multi-threaded contexts
 
 **Testing Requirements:**
@@ -410,7 +407,7 @@ We welcome contributions and maintain high software engineering standards! Pleas
 
 ### Automated Quality Assurance
 
-**Pre-Commit Checks:**
+TODO: **Pre-Commit Checks:**
 ```bash
 # Run local quality checks before committing
 west build -t cppcheck           # Static analysis
