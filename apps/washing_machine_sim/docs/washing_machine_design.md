@@ -400,25 +400,10 @@ classDiagram
     ControllerThread --> MessageQueue : gets events
     ShellThread --> WorkQueueThread : triggers via event bus
     
-    note for MainThread
-        Runs only during initialization
-        then sleeps forever
-    end note
-    
-    note for ControllerThread
-        Core FSM processing thread
-        Event-driven execution
-    end note
-    
-    note for WorkQueueThread
-        Event bus callback execution
-        Lightweight event forwarding
-    end note
-    
-    note for ShellThread
-        User interface handling
-        Command processing
-    end note
+    note for MainThread "Runs only during initialization<br/>then sleeps forever"
+    note for ControllerThread "Core FSM processing thread<br/>Event-driven execution"
+    note for WorkQueueThread "Event bus callback execution<br/>Lightweight event forwarding"
+    note for ShellThread "User interface handling<br/>Command processing"
 ```
 
 ## Data Structures
