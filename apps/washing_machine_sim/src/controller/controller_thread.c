@@ -71,22 +71,24 @@ int controller_thread_init(void)
 {
     // List of all events the FSM cares about.
     static const event_id_t subscribed_events[] = {
-        EVENT_POWER_BUTTON_PRESSED,
-        EVENT_CYCLE_SELECTED,
-        EVENT_START_BUTTON_PRESSED,
-        EVENT_PAUSE_BUTTON_PRESSED,
-        EVENT_CANCEL_BUTTON_PRESSED,
         EVENT_ANY_KEY_PRESSED,
-        EVENT_WEIGHT_CALCULATED,
+        EVENT_CANCEL_BUTTON_PRESSED,
+        EVENT_CYCLE_FINISHED,
+        EVENT_CYCLE_SELECTED,
+        EVENT_DOOR_CLOSED,
+        EVENT_DOOR_OPENED,        
         EVENT_DOSING_COMPLETE,
-        EVENT_TIMER_EXPIRED,
         EVENT_DRUM_EMPTY,
-        EVENT_WATER_LEVEL_REACHED,
-        EVENT_TEMP_REACHED,
+        EVENT_FATAL_FAULT_DETECTED,
+        EVENT_PAUSE_BUTTON_PRESSED,
+        EVENT_POWER_BUTTON_PRESSED,
         EVENT_POWER_LOSS_DETECTED,
         EVENT_POWER_RESTORED,
-        EVENT_FATAL_FAULT_DETECTED,
-        EVENT_CYCLE_FINISHED,
+        EVENT_START_BUTTON_PRESSED,
+        EVENT_TEMP_REACHED,
+        EVENT_TIMER_EXPIRED,
+        EVENT_WATER_LEVEL_REACHED,
+        EVENT_WEIGHT_CALCULATED,
     };
 
     // Register our lightweight callback with the event bus

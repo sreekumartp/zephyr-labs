@@ -5,6 +5,7 @@
 #include "event_bus.h"
 #include "shell_interface.h"
 #include "fsm.h"
+#include "sim_door_sensor.h"
 
 LOG_MODULE_REGISTER(shell_interface, LOG_LEVEL_INF);
 
@@ -54,6 +55,27 @@ static int cmd_send_event(const struct shell *shell, size_t argc, char **argv)
 // Register the "send" command with subcommands for each event type
 // This makes the shell interface user-friendly and self-documenting.
 SHELL_CMD_REGISTER(send_event, NULL, "Send a specific event to the event bus", cmd_send_event);
+
+static int cmd_set_door_state(const struct shell *shell, size_t argc, char **argv)
+{
+    if (argc < 2) {
+        shell_error(shell, "Please provide door state: 0 (open) or 1 (closed).");
+        return -EINVAL;
+    }
+
+    int state = atoi(argv[1]);
+    if (state != 0 && state != 1) {
+        shell_error(shell, "Invalid state: %d. Use 0 (open) or 1 (closed).", state);
+        return -EINVAL;
+    }
+
+    door_sensor_sim_set_state(state ? true : false);
+    shell_print(shell, "Door sensor state set to: %s", state ? "closed" : "open");
+    return 0;
+}
+
+SHELL_CMD_REGISTER(set_door_state, NULL, "Set the simulated door sensor state: 0=open, 1=closed", cmd_set_door_state);
+
 
 void shell_interface_init(void) {
     // Nothing needed for now
