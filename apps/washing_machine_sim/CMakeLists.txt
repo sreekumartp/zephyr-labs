@@ -31,7 +31,7 @@ target_include_directories(app PRIVATE
     door_sensor/include
 )
 add_subdirectory(door_sensor)
-target_link_libraries(app PRIVATE door_sensor)
+# target_link_libraries(app PRIVATE door_sensor)
 
 # Link the application against the library target.
 target_link_libraries(app PRIVATE event_bus_lib)
